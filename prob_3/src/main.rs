@@ -13,10 +13,16 @@ fn main() {
 }
 
 fn priority(sack: &str) -> i32 {
-    let left = &sack[0..sack.len()/2].chars().collect::<HashSet<char>>();
-    let right = &sack[sack.len()/2 + 1..].chars().collect::<HashSet<char>>();
+    let (a, b) = &sack.split_at(sack.len()/2);
+    let left = &a.chars().collect::<HashSet<char>>();
+    let right = &b.chars().collect::<HashSet<char>>();
+    assert!(a.len() == b.len(), "Split error");
 
-    let letter = left.union(&right).next().unwrap().clone() as i32;
+    let intersec = left.intersection(&right).collect::<Vec<&char>>();
+
+    assert!(intersec.len() == 1, "Sack: {:?}\nLeft: {:?}\n Right: {:?}\n Intersection: {:?}", sack, left, right, intersec);
+
+    let letter = intersec[0].clone() as i32;
 
     if letter < 97 { // Lowercase ASCII
         letter - 65 + 26 + 1
