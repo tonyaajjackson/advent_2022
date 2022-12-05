@@ -1,14 +1,8 @@
-use std::env;
 use std::fs;
 use std::collections::HashSet;
-use std::any::type_name;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    let filename = &args[1];
-
-    let input = fs::read_to_string(filename).expect("File error");
+    let input = fs::read_to_string("input.txt").expect("File error");
 
     let sacks = input.split_terminator("\n");
 
@@ -19,22 +13,28 @@ fn main() {
 }
 
 fn priority(sack: &str) -> i32 {
-    let comp_1 = Vec::from(sack[0..sack.len()/2]);
-    let items = HashSet::from(comp_1.clone());
+    let left = &sack[0..sack.len()/2].chars().collect::<HashSet<char>>();
+    let right = &sack[sack.len()/2 + 1..].chars().collect::<HashSet<char>>();
 
-    // for letter in comp_1 {
-    //     items.insert(letter.clone());
-    // }
+    let letter = left.union(&right).next().unwrap().clone() as i32;
 
-    // println!("{:?}", sack);
-    // println!("{:?}", comp_1);
-
-    println!("{:?}", items);
-    
-    0
+    if letter < 97 { // Lowercase ASCII
+        letter - 65 + 26 + 1
+    } else {
+        letter - 97 + 1
+    }
 }
 
+#[cfg(test)]
+mod tests {
+    use crate::priority;
 
-fn type_of<T>(_: T) -> &'static str {
-    type_name::<T>()
+    #[test]
+    fn test_priority() {
+        assert_eq!(priority("aa"), 1);
+        assert_eq!(priority("bb"), 2);
+        assert_eq!(priority("zz"), 26);
+        assert_eq!(priority("AA"), 27);
+        assert_eq!(priority("ZZ"), 52);
+    }
 }
